@@ -21,6 +21,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./backend
+        load: true
         push: false
         tags: heinminhtet/healthy-food-list-backend:latest
 
@@ -28,6 +29,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./frontend
+        load: true
         push: false
         tags: heinminhtet/healthy-food-list-frontend:latest
     
