@@ -1,0 +1,78 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build backend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./lab_app/backend
+        push: false
+        tags: your-docker-hub-username/healthy-food-list-backend:latest
+
+    - name: Build frontend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./lab_app/frontend
+        push: false
+        tags: your-docker-hub-username/healthy-food-list-frontend:latest
+    
+    - name: Run docker-compose
+      run: docker-compose -f ./lab_app/docker-compose.yml up -d
+
+    - name: Wait for services to be healthy
+      run: |
+        sleep 10
+        docker-compose -f ./lab_app/docker-compose.yml ps
+        curl -f http://localhost:8080/health
+
+    - name: Test API endpoint
+      run: |
+        curl -f http://localhost:8080/api/data | grep "Avocado"
+
+    - name: Stop services
+      if: always()
+      run: docker-compose -f ./lab_app/docker-compose.yml down
+
+  # push_to_registry:
+  #   needs: build_and_test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v3
+
+  #   - name: Log in to Docker Hub
+  #     uses: docker/login-action@v2
+  #     with:
+  #       username: ${{ secrets.DOCKER_USERNAME }}
+  #       password: ${{ secrets.DOCKER_PASSWORD }}
+
+  #   - name: Build and push backend image
+  #     uses: docker/build-push-action@v4
+  #     with:
+  #       context: ./lab_app/backend
+  #       push: true
+  #       tags: your-docker-hub-username/healthy-food-list-backend:latest
+
+  #   - name: Build and push frontend image
+  #     uses: docker/build-push-action@v4
+  #     with:
+  #       context: ./lab_app/frontend
+  #       push: true
+  #       tags: your-docker-hub-username/healthy-food-list-frontend:latest
