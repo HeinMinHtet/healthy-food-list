@@ -20,7 +20,7 @@ EXPOSE 5000
 # Define environment variable
 ENV FLASK_ENV=production
 ENV PORT=5000
-ENV S3_JSON_URL=""
+ENV S3_JSON_URL="https://healthy-food-list.s3.ap-southeast-7.amazonaws.com/public/food.json"
 
 # Run app.py when the container launches
 CMD ["python", "app.py"]

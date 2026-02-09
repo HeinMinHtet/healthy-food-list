@@ -13,7 +13,7 @@ def health():
 # The main data endpoint
 @app.route('/api/data')
 def get_data():
-    s3_json_url = os.environ.get('https://healthy-food-list.s3.ap-southeast-7.amazonaws.com/food.json')
+    s3_json_url = os.environ.get('S3_JSON_URL')
 
     if s3_json_url:
         try:

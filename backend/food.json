@@ -1,0 +1,29 @@
+{
+  "foods": [
+    {
+      "name": "Avocado",
+      "category": "Fruit",
+      "calories": 160
+    },
+    {
+      "name": "Broccoli",
+      "category": "Vegetable",
+      "calories": 55
+    },
+    {
+      "name": "Salmon",
+      "category": "Fish",
+      "calories": 206
+    },
+    {
+      "name": "Almonds",
+      "category": "Nuts",
+      "calories": 7
+    },
+    {
+      "name": "Oats",
+      "category": "Grain",
+      "calories": 150
+    }
+  ]
+}
