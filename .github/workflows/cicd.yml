@@ -91,4 +91,4 @@ jobs:
       with:
         context: ./frontend
         push: true
-        tags: heinminhtet/healthy-food-list-frontend:latest
+        tags: heinminhtet/healthy-food-list-frontend:latest 
