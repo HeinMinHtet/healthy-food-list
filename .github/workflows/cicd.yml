@@ -50,6 +50,8 @@ jobs:
         done
         echo "Services did not become healthy after 75 seconds."
         docker compose -f ./docker-compose.yml ps
+        echo "--- DOCKER LOGS ---"
+        docker compose -f ./docker-compose.yml logs
         exit 1
 
     - name: Test API endpoint
