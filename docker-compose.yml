@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend
+    image: heinminhtet/healthy-food-list-backend:latest
     restart: always
     environment:
       - FLASK_ENV=production
@@ -16,7 +16,7 @@ services:
       retries: 5
 
   frontend:
-    build: ./frontend
+    image: heinminhtet/healthy-food-list-frontend:latest
     restart: always
     expose:
       - 80
