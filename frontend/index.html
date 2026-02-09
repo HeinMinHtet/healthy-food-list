@@ -38,12 +38,12 @@
                 })
                 .then(data => {
                     const tableBody = document.querySelector('#food-table tbody');
-                    data.forEach(item => {
+                    data.foods.forEach(item => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${item.name}</td>
                             <td>${item.calories}</td>
-                            <td>${item.food_type}</td>
+                            <td>${item.category}</td>
                         `;
                         tableBody.appendChild(row);
                     });
