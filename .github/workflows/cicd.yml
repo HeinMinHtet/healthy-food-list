@@ -32,12 +32,12 @@ jobs:
         tags: heinminhtet/healthy-food-list-frontend:latest
     
     - name: Run docker-compose
-      run: docker-compose -f ./docker-compose.yml up -d
+      run: docker compose -f ./docker-compose.yml up -d
 
     - name: Wait for services to be healthy
       run: |
         sleep 10
-        docker-compose -f ./docker-compose.yml ps
+        docker compose -f ./docker-compose.yml ps
         curl -f http://localhost:8080/health
 
     - name: Test API endpoint
@@ -46,7 +46,7 @@ jobs:
 
     - name: Stop services
       if: always()
-      run: docker-compose -f ./docker-compose.yml down
+      run: docker compose -f ./docker-compose.yml down
 
   push_to_registry:
     needs: build_and_test
