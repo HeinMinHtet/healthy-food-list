@@ -4,7 +4,7 @@ services:
     restart: always
     environment:
       - FLASK_ENV=production
-      - S3_JSON_URL=${S3_JSON_URL:-} # Use shell environment variable if set, otherwise empty
+      - S3_JSON_URL=https://healthy-food-list.s3.ap-southeast-7.amazonaws.com/public/food.json
     expose:
       - 5000
     healthcheck:
