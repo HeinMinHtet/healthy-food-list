@@ -33,6 +33,9 @@ jobs:
         push: false
         tags: heinminhtet/healthy-food-list-frontend:latest
     
+    - name: List files in workspace
+      run: ls -la
+
     - name: Run docker-compose
       run: docker compose -f ./docker-compose.yml up -d
 
