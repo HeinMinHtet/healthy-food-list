@@ -34,7 +34,7 @@ jobs:
         tags: heinminhtet/healthy-food-list-frontend:latest
     
     - name: Run docker-compose
-      run: docker compose -f ./docker-compose.yml up -d
+      run: docker compose -f healthy-food-list/docker-compose.yml up -d
 
     - name: Wait for services to be healthy
       run: |
@@ -44,16 +44,16 @@ jobs:
         for i in {1..6}; do
           if curl -f http://localhost:8081/health; then
             echo "Services are healthy."
-            docker compose -f ./docker-compose.yml ps
+            docker compose -f healthy-food-list/docker-compose.yml ps
             exit 0
           fi
           echo "Attempt $i failed. Retrying in 10 seconds..."
           sleep 10
         done
         echo "Services did not become healthy after 75 seconds."
-        docker compose -f ./docker-compose.yml ps
+        docker compose -f healthy-food-list/docker-compose.yml ps
         echo "--- DOCKER LOGS ---"
-        docker compose -f ./docker-compose.yml logs
+        docker compose -f healthy-food-list/docker-compose.yml logs
         exit 1
 
     - name: Test API endpoint
@@ -62,7 +62,7 @@ jobs:
 
     - name: Stop services
       if: always()
-      run: docker compose -f ./docker-compose.yml down
+      run: docker compose -f healthy-food-list/docker-compose.yml down
 
   push_to_registry:
     needs: build_and_test
