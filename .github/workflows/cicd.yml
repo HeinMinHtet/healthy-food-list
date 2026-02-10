@@ -2,70 +2,78 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Build backend image
-      uses: docker/build-push-action@v4
-      with:
-        context: ./backend
-        load: true
-        push: false
-        tags: heinminhtet/healthy-food-list-backend:latest
+      - name: Build backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          load: true
+          push: false
+          tags: heinminhtet/healthy-food-list-backend:latest
 
-    - name: Build frontend image
-      uses: docker/build-push-action@v4
-      with:
-        context: ./frontend
-        load: true
-        push: false
-        tags: heinminhtet/healthy-food-list-frontend:latest
-    
-    - name: List files in workspace
-      run: ls -la
+      - name: Build frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          load: true
+          push: false
+          tags: heinminhtet/healthy-food-list-frontend:latest
 
-    - name: Run docker-compose
-      run: docker compose -f ./docker-compose.yml up -d
+      - name: Build NGINX image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./nginx
+          load: true
+          push: false
+          tags: heinminhtet/healthy-food-list-nginx:latest
 
-    - name: Wait for services to be healthy
-      run: |
-        echo "Waiting for services to start..."
-        sleep 15
-        echo "Polling for health endpoint..."
-        for i in {1..6}; do
-          if curl -f http://localhost:8081/health; then
-            echo "Services are healthy."
-            docker compose -f ./docker-compose.yml ps
-            exit 0
-          fi
-          echo "Attempt $i failed. Retrying in 10 seconds..."
-          sleep 10
-        done
-        echo "Services did not become healthy after 75 seconds."
-        docker compose -f ./docker-compose.yml ps
-        echo "--- DOCKER LOGS ---"
-        docker compose -f ./docker-compose.yml logs
-        exit 1
+      - name: List files in workspace
+        run: ls -la
 
-    - name: Test API endpoint
-      run: |
-        curl -f http://localhost:8081/api/data | grep "Avocado"
+      - name: Run docker-compose
+        run: docker compose -f ./docker-compose.yml up -d
 
-    - name: Stop services
-      if: always()
-      run: docker compose -f ./docker-compose.yml down
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to start..."
+          sleep 15
+          echo "Polling for health endpoint..."
+          for i in {1..6}; do
+            if curl -f http://localhost:8081/health; then
+              echo "Services are healthy."
+              docker compose -f ./docker-compose.yml ps
+              exit 0
+            fi
+            echo "Attempt $i failed. Retrying in 10 seconds..."
+            sleep 10
+          done
+          echo "Services did not become healthy after 75 seconds."
+          docker compose -f ./docker-compose.yml ps
+          echo "--- DOCKER LOGS ---"
+          docker compose -f ./docker-compose.yml logs
+          exit 1
+
+      - name: Test API endpoint
+        run: |
+          curl -f http://localhost:8081/api/data | grep "Avocado"
+
+      - name: Stop services
+        if: always()
+        run: docker compose -f ./docker-compose.yml down
 
   push_to_registry:
     needs: build_and_test
@@ -73,25 +81,32 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push backend image
-      uses: docker/build-push-action@v4
-      with:
-        context: ./backend
-        push: true
-        tags: heinminhtet/healthy-food-list-backend:latest
+      - name: Build and push backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: heinminhtet/healthy-food-list-backend:latest
 
-    - name: Build and push frontend image
-      uses: docker/build-push-action@v4
-      with:
-        context: ./frontend
-        push: true
-        tags: heinminhtet/healthy-food-list-frontend:latest
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: heinminhtet/healthy-food-list-frontend:latest
+
+      - name: Build and push NGINX image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./nginx
+          push: true
+          tags: heinminhtet/healthy-food-list-nginx:latest
